@@ -47,7 +47,6 @@ export default function Home() {
       setTestRunning(false);
       getTypingTest({
         topic,
-        tokens: 100
       }).then(res => {
         setScore(0);
         setTypedWords([]);
@@ -84,34 +83,30 @@ export default function Home() {
     }
   }, [typedWords, wordsToType, inputValue, score, currentWord]);
 
-  const renderTest = React.useCallback(() => {
-    let content = null;
-    
+  const renderContent = React.useCallback(() => {
     if(loading) {
-      content = (<Spinner />);
-    } else if(!testRunning && !score) {
-      content = (
-        <div className='italic w-full text-center'>Click on &ldquo;Restart&rdquo; to start the test</div>
-      )
-    } else {
-      content = (
-        <div className="select-none">
+      return (
+        <div className="bg-zinc-800 rounded w-1/2 p-3 text-xl">
+          <Spinner />
+        </div>
+      );
+    } 
+    if (testRunning) {
+      return (
+        <div className="select-none bg-zinc-800 rounded w-1/2 p-3 text-xl">
           <span className="text-green-500">{typedWords.map(word => word + ' ')}</span>
           <CurrentWord word={currentWord} inputValue={inputValue} />{' '}
           <span className="">{wordsToType.map(word => word + ' ')}</span>
         </div>
       );
-    }
+    } 
 
-    if (!testRunning && score && !loading) {
-      return;
-    }
     return (
-      <div className="bg-zinc-800 rounded w-1/2 p-3 text-xl">
-        {content}
+      <div className="flex gap-1 w-1/2">
+        <input type="text" className='bg-zinc-800 focus:outline-none p-2 rounded grow text-center' maxLength={30} value={topic} onChange={e => setTopic(e.target.value)} placeholder="Topic..." />
       </div>
     );
-  }, [loading, testRunning, typedWords, currentWord, inputValue, wordsToType, score]);
+  }, [loading, testRunning, typedWords, currentWord, inputValue, wordsToType, topic]);
 
   const getWPM = React.useCallback(() => {
     if(!startTime) return;
@@ -138,10 +133,7 @@ export default function Home() {
           <div className='bg-zinc-800 rounded p-2 text-center'>Time: <Timer startTime={startTime} endTime={endTime} running={testRunning} /></div>
           <div className='bg-zinc-800 rounded p-2 text-center'>WPM: {getWPM()}</div>
         </div>
-        <div className="flex gap-1 w-1/2">
-          <input type="text" className='bg-zinc-800 focus:outline-none p-2 rounded grow text-center' maxLength={30} onChange={e => setTopic(e.target.value)} placeholder="Topic..." />
-        </div>
-        {renderTest()}
+        {renderContent()}
         <div className='flex gap-1 w-1/2'>
           <input className='bg-zinc-800 focus:outline-none p-2 rounded grow' onChange={onType} value={inputValue} ref={inputRef} />
           <button onClick={restartTest} className='bg-zinc-800 rounded p-2'>Restart</button>
