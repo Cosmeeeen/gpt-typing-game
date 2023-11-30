@@ -37,13 +37,18 @@ export default function Home() {
   const [startTime, setStartTime] = React.useState<number>();
   const [endTime, setEndTime] = React.useState<number>();
 
+  const [topic, setTopic] = React.useState<string>('');
+
   const inputRef = React.useRef<HTMLInputElement>(null);
 
   const restartTest = React.useCallback(() => {
     if(!loading) {
       setLoading(true);
       setTestRunning(false);
-      getTypingTest().then(res => {
+      getTypingTest({
+        topic,
+        tokens: 100
+      }).then(res => {
         setScore(0);
         setTypedWords([]);
         setCurrentWord(res.split(' ')[0]);
@@ -58,7 +63,7 @@ export default function Home() {
         console.error(err);
       });
     }
-  }, [loading, inputRef]);
+  }, [loading, inputRef, topic]);
 
   const onType = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -70,7 +75,7 @@ export default function Home() {
         setEndTime(Date.now());
       }
       setTypedWords([...typedWords, inputValue]);
-      setScore(score + getWordScore(currentWord));
+      setScore(score + getWordScore(currentWord) + (value.endsWith(' ') ? 1 : 0));
       setCurrentWord(wordsToType[0]);
       setWordsToType(wordsToType.slice(1));
       setInputValue('');
@@ -98,7 +103,7 @@ export default function Home() {
       );
     }
 
-    if (!testRunning && score) {
+    if (!testRunning && score && !loading) {
       return;
     }
     return (
@@ -132,6 +137,9 @@ export default function Home() {
         <div className='grid gap-1 w-1/2 grid-cols-2'>
           <div className='bg-zinc-800 rounded p-2 text-center'>Time: <Timer startTime={startTime} endTime={endTime} running={testRunning} /></div>
           <div className='bg-zinc-800 rounded p-2 text-center'>WPM: {getWPM()}</div>
+        </div>
+        <div className="flex gap-1 w-1/2">
+          <input type="text" className='bg-zinc-800 focus:outline-none p-2 rounded grow text-center' maxLength={30} onChange={e => setTopic(e.target.value)} placeholder="Topic..." />
         </div>
         {renderTest()}
         <div className='flex gap-1 w-1/2'>

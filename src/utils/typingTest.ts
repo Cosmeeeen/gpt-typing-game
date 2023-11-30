@@ -19,7 +19,12 @@ export const getRandomWords = (count: number): string[] => {
   return Array(count).fill(null).map(() => getRandomWord());
 };
 
-export const getTypingTest = async ():Promise<string> => {
-  const result = await axios.get<{ prompt: string }>('/api/gpt/generate');
+interface TTypingTestOptions {
+  topic?: string;
+  tokens?: number;
+}
+export const getTypingTest = async ({ topic = '', tokens = 100 }:TTypingTestOptions = {}):Promise<string> => {
+  tokens = Math.max(1, Math.min(200, tokens));
+  const result = await axios.get<{ prompt: string }>('/api/gpt/generate', { params: { topic, tokens } });
   return Promise.resolve(result.data?.prompt);
 };
