@@ -53,10 +53,10 @@ export default function Home() {
         setCurrentWord(res.split(' ')[0]);
         setWordsToType(res.split(' ').slice(1));
         setInputValue('');
-        inputRef?.current?.focus();
         setLoading(false);
         setTestRunning(true);
         setStartTime(Date.now());
+        inputRef?.current?.focus();
       }).catch(err => {
         setTestRunning(false);
         console.error(err);
@@ -86,14 +86,14 @@ export default function Home() {
   const renderContent = React.useCallback(() => {
     if(loading) {
       return (
-        <div className="bg-zinc-800 rounded w-1/2 p-3 text-xl">
+        <div className="bg-zinc-800 rounded w-full p-3 text-xl">
           <Spinner />
         </div>
       );
     } 
     if (testRunning) {
       return (
-        <div className="select-none bg-zinc-800 rounded w-1/2 p-3 text-xl">
+        <div className="select-none bg-zinc-800 rounded w-full p-3 text-xl">
           <span className="text-green-500">{typedWords.map(word => word + ' ')}</span>
           <CurrentWord word={currentWord} inputValue={inputValue} />{' '}
           <span className="">{wordsToType.map(word => word + ' ')}</span>
@@ -102,11 +102,25 @@ export default function Home() {
     } 
 
     return (
-      <div className="flex gap-1 w-1/2">
-        <input type="text" className='bg-zinc-800 focus:outline-none p-2 rounded grow text-center' maxLength={30} value={topic} onChange={e => setTopic(e.target.value)} placeholder="Topic..." />
+      <div className="flex gap-1 w-full">
+        <input type="text" className='bg-zinc-800 focus:outline-none p-2 rounded grow text-center italic' maxLength={30} value={topic} onChange={e => setTopic(e.target.value)} placeholder="Topic..." />
       </div>
     );
   }, [loading, testRunning, typedWords, currentWord, inputValue, wordsToType, topic]);
+
+  const renderBottom = React.useCallback(() => {
+    if(testRunning || loading) {
+      return (
+        <div className='flex gap-1 w-full'>
+          <input className='bg-zinc-800 focus:outline-none p-2 rounded grow' onChange={onType} value={inputValue} ref={inputRef} />
+          <button onClick={restartTest} className='bg-zinc-800 rounded p-2'>Restart</button>
+        </div>
+      );
+    }
+    return (
+      <button onClick={restartTest} className='bg-zinc-800 rounded p-2 w-full'>Start</button>
+    );
+  }, [testRunning, loading, inputValue, onType, restartTest]);
 
   const getWPM = React.useCallback(() => {
     if(!startTime) return;
@@ -128,15 +142,14 @@ export default function Home() {
         <meta name="description" content="A typing game that uses the GPT Api in order to generate topical texts." />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="flex min-h-screen flex-col items-center justify-center bg-zinc-900 text-zinc-100 gap-1">
-        <div className='grid gap-1 w-1/2 grid-cols-2'>
-          <div className='bg-zinc-800 rounded p-2 text-center'>Time: <Timer startTime={startTime} endTime={endTime} running={testRunning} /></div>
-          <div className='bg-zinc-800 rounded p-2 text-center'>WPM: {getWPM()}</div>
-        </div>
-        {renderContent()}
-        <div className='flex gap-1 w-1/2'>
-          <input className='bg-zinc-800 focus:outline-none p-2 rounded grow' onChange={onType} value={inputValue} ref={inputRef} />
-          <button onClick={restartTest} className='bg-zinc-800 rounded p-2'>Restart</button>
+      <main className="flex min-h-screen flex-col items-center justify-center bg-zinc-900 text-zinc-100">
+        <div className='flex flex-col w-1/2 gap-1'>
+          <div className='grid gap-1 w-full grid-cols-2'>
+            <div className='bg-zinc-800 rounded p-2 text-center'>Time: <Timer startTime={startTime} endTime={endTime} running={testRunning} /></div>
+            <div className='bg-zinc-800 rounded p-2 text-center'>WPM: {getWPM()}</div>
+          </div>
+          {renderContent()}
+          {renderBottom()}
         </div>
       </main>
     </>
