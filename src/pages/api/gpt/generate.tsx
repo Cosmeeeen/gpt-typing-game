@@ -1,7 +1,7 @@
 import OpenAI from 'openai';
 
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { ChatCompletionMessageParam } from 'openai/resources';
+import type { ChatCompletionMessageParam } from 'openai/resources';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
