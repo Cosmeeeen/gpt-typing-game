@@ -5,6 +5,7 @@ import { getTypingTest, getWordScore } from '~/utils/typingTest';
 import Spinner from '~/components/Spinner';
 import Timer from '~/components/Timer';
 import Link from 'next/link';
+import { api } from '~/utils/api';
 
 const CurrentWord: React.FC<{ word: string | undefined, inputValue: string }> = ({ word, inputValue }) => {
   return (
@@ -42,6 +43,8 @@ export default function Home() {
 
   const inputRef = React.useRef<HTMLInputElement>(null);
 
+  const { mutate: mutateResult } = api.testResults.create.useMutation();
+
   const restartTest = React.useCallback(() => {
     if (!loading) {
       setLoading(true);
@@ -71,8 +74,7 @@ export default function Home() {
       (value.endsWith(' ') && value.trim() === currentWord) ||
       (value.trim() === currentWord && wordsToType.length === 0)) {
       if (wordsToType.length === 0) {
-        setTestRunning(false);
-        setEndTime(Date.now());
+        submitResult();
       }
       setTypedWords([...typedWords, inputValue]);
       setScore(score + getWordScore(currentWord) + (value.endsWith(' ') ? 1 : 0));
@@ -138,6 +140,16 @@ export default function Home() {
     const minutes = (currentEndTime - startTime) / 1000 / 60;
     return Math.floor(score / 5 / minutes);
   }, [score, startTime, endTime, testRunning]);
+
+  const submitResult = React.useCallback(() => {
+    setTestRunning(false);
+    setEndTime(Date.now());
+    const resultsObject = {
+      wpm: getWPM() ?? 0,
+      prompt: topic,
+    };
+    mutateResult(resultsObject);
+  }, [topic, getWPM, mutateResult]);
 
   return (
     <>

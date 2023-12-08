@@ -1,26 +1,24 @@
 import * as React from "react";
 import Head from "next/head";
-import axios from "axios";
 import moment from 'moment';
 
 import type { TestResult } from "@prisma/client";
 import Spinner from "~/components/Spinner";
 import Link from "next/link";
+import { api } from "~/utils/api";
 
 const ResultsPage: React.FC = () => {
   const [loading, setLoading] = React.useState<boolean>(true);
   const [results, setResults] = React.useState<TestResult[]>([]);
+  const { data } = api.testResults.getAll.useQuery();
 
   React.useEffect(() => {
-    axios.get<TestResult[]>('/api/results').then(res => {
-      const { data } = res;
-      setResults(data);
-      setLoading(false);
-    }).catch(err => {
-      console.error(err);
-      setLoading(false);
-    });
-  }, []);
+    if (!data) {
+      return;
+    }
+    setResults(data);
+    setLoading(false);
+  }, [data]);
 
   const renderHeader = React.useCallback(() => {
     let headerText = '';
