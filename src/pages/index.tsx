@@ -4,6 +4,7 @@ import Head from "next/head";
 import { getTypingTest, getWordScore } from '~/utils/typingTest';
 import Spinner from '~/components/Spinner';
 import Timer from '~/components/Timer';
+import Link from 'next/link';
 
 const CurrentWord: React.FC<{ word: string | undefined, inputValue: string }> = ({ word, inputValue }) => {
   return (
@@ -42,7 +43,7 @@ export default function Home() {
   const inputRef = React.useRef<HTMLInputElement>(null);
 
   const restartTest = React.useCallback(() => {
-    if(!loading) {
+    if (!loading) {
       setLoading(true);
       setTestRunning(false);
       getTypingTest({
@@ -66,10 +67,10 @@ export default function Home() {
 
   const onType = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if(
-      (value.endsWith(' ') && value.trim() === currentWord) || 
+    if (
+      (value.endsWith(' ') && value.trim() === currentWord) ||
       (value.trim() === currentWord && wordsToType.length === 0)) {
-      if(wordsToType.length === 0) {
+      if (wordsToType.length === 0) {
         setTestRunning(false);
         setEndTime(Date.now());
       }
@@ -84,13 +85,13 @@ export default function Home() {
   }, [typedWords, wordsToType, inputValue, score, currentWord]);
 
   const renderContent = React.useCallback(() => {
-    if(loading) {
+    if (loading) {
       return (
         <div className="bg-zinc-800 rounded w-full p-3 text-xl">
           <Spinner />
         </div>
       );
-    } 
+    }
     if (testRunning) {
       return (
         <div className="select-none bg-zinc-800 rounded w-full p-3 text-xl">
@@ -99,7 +100,7 @@ export default function Home() {
           <span className="">{wordsToType.map(word => word + ' ')}</span>
         </div>
       );
-    } 
+    }
 
     return (
       <div className="flex gap-1 w-full">
@@ -109,7 +110,7 @@ export default function Home() {
   }, [loading, testRunning, typedWords, currentWord, inputValue, wordsToType, topic]);
 
   const renderBottom = React.useCallback(() => {
-    if(testRunning || loading) {
+    if (testRunning || loading) {
       return (
         <div className='flex gap-1 w-full'>
           <input className='bg-zinc-800 focus:outline-none p-2 rounded grow' onChange={onType} value={inputValue} ref={inputRef} />
@@ -118,16 +119,19 @@ export default function Home() {
       );
     }
     return (
-      <button onClick={restartTest} className='bg-zinc-800 rounded p-2 w-full'>Start</button>
+      <div className='flex gap-1 w-full'>
+        <button onClick={restartTest} className='bg-zinc-800 rounded p-2 grow'>Start</button>
+        <Link href='/results' className='bg-zinc-800 rounded py-2 px-5'>Results</Link>
+      </div>
     );
   }, [testRunning, loading, inputValue, onType, restartTest]);
 
   const getWPM = React.useCallback(() => {
-    if(!startTime) return;
+    if (!startTime) return;
 
     let currentEndTime = Date.now();
 
-    if(!testRunning && endTime) {
+    if (!testRunning && endTime) {
       currentEndTime = endTime;
     }
 
