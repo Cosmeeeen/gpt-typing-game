@@ -6,6 +6,7 @@ import Spinner from '~/components/Spinner';
 import Timer from '~/components/Timer';
 import Link from 'next/link';
 import { api } from '~/utils/api';
+import UserPortrait from '~/components/UserPortrait';
 
 const CurrentWord: React.FC<{ word: string | undefined, inputValue: string }> = ({ word, inputValue }) => {
   return (
@@ -159,6 +160,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-center bg-zinc-900 text-zinc-100">
+        <UserPortrait className="fixed top-5 right-5" />
         <div className='flex flex-col w-1/2 gap-1'>
           <div className='grid gap-1 w-full grid-cols-2'>
             <div className='bg-zinc-800 rounded p-2 text-center'>Time: <Timer startTime={startTime} endTime={endTime} running={testRunning} /></div>
