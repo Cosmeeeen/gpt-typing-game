@@ -6,11 +6,14 @@ import type { TestResult } from "@prisma/client";
 import Spinner from "~/components/Spinner";
 import Link from "next/link";
 import { api } from "~/utils/api";
+import { useSession } from "next-auth/react";
 
 const ResultsPage: React.FC = () => {
   const [loading, setLoading] = React.useState<boolean>(true);
   const [results, setResults] = React.useState<TestResult[]>([]);
-  const { data } = api.testResults.getAll.useQuery();
+  // const { data } = api.testResults.getAll.useQuery();
+  const { data: session } = useSession();
+  const { data } = api.testResults.getByUser.useQuery({ userId: session?.user.id });
 
   React.useEffect(() => {
     if (!data) {
@@ -24,6 +27,8 @@ const ResultsPage: React.FC = () => {
     let headerText = '';
     if (results.length === 0) {
       headerText = 'No results yet';
+    } else if (!session) {
+      headerText = 'Sign in to save your results';
     } else {
       headerText = `Results (${results.length})`;
     }
@@ -33,10 +38,10 @@ const ResultsPage: React.FC = () => {
         <h1 className='bg-zinc-800 rounded text-center text-xl p-2 grow'>{headerText}</h1>
       </div>
     );
-  }, [results.length]);
+  }, [results.length, session]);
 
   const renderResults = React.useCallback(() => {
-    if (results.length === 0) {
+    if (results.length === 0 || !session) {
       return null;
     }
     return (
@@ -55,7 +60,7 @@ const ResultsPage: React.FC = () => {
         ))}
       </table>
     );
-  }, [results]);
+  }, [results, session]);
 
   return (
     <>

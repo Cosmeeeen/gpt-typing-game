@@ -13,8 +13,9 @@ model TestResult {
     finishedAt DateTime @default(now())
     prompt     String   @default("")
     wpm        Int
+    userId     String?
 
-    @@index([finishedAt])
+    @@index([userId])
 }
 
 // Necessary for Next auth
