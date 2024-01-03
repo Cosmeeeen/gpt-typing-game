@@ -2,7 +2,8 @@ import Image from 'next/image';
 import * as React from 'react';
 
 import defaultPortrait from '../data/defaultPortrait.png';
-import { signIn, signOut, useSession } from 'next-auth/react';
+import { signIn, useSession } from 'next-auth/react';
+import { useRouter } from 'next/router';
 
 interface UserPortraitProps {
   className?: string;
@@ -10,6 +11,7 @@ interface UserPortraitProps {
 
 const UserPortrait: React.FC<UserPortraitProps> = ({ className }) => {
   const { data: session } = useSession();
+  const router = useRouter();
 
   return (
     <div className={className + ' flex justify-row justify-center items-center gap-3'}>
@@ -17,10 +19,10 @@ const UserPortrait: React.FC<UserPortraitProps> = ({ className }) => {
       <Image
         src={session?.user?.image ?? defaultPortrait}
         alt="User picture"
-        className="w-14 h-14 bg-zinc-800 border-2 rounded-full"
+        className="w-14 h-14 bg-zinc-800 border-2 rounded-full cursor-pointer"
         width={500}
         height={500}
-        onClick={() => session ? void signOut() : void signIn()} />
+        onClick={() => session ? void router.push('/profile') : void signIn()} />
     </div>
   );
 };

@@ -7,6 +7,7 @@ import Timer from '~/components/Timer';
 import Link from 'next/link';
 import { api } from '~/utils/api';
 import UserPortrait from '~/components/UserPortrait';
+import { useSession } from 'next-auth/react';
 
 const CurrentWord: React.FC<{ word: string | undefined, inputValue: string }> = ({ word, inputValue }) => {
   return (
@@ -45,6 +46,7 @@ export default function Home() {
   const inputRef = React.useRef<HTMLInputElement>(null);
 
   const { mutate: mutateResult } = api.testResults.create.useMutation();
+  const { status } = useSession();
 
   const restartTest = React.useCallback(() => {
     if (!loading) {
@@ -69,6 +71,30 @@ export default function Home() {
     }
   }, [loading, inputRef, topic]);
 
+  const getWPM = React.useCallback(() => {
+    if (!startTime) return;
+
+    let currentEndTime = Date.now();
+
+    if (!testRunning && endTime) {
+      currentEndTime = endTime;
+    }
+
+    const minutes = (currentEndTime - startTime) / 1000 / 60;
+    return Math.floor(score / 5 / minutes);
+  }, [score, startTime, endTime, testRunning]);
+
+  const submitResult = React.useCallback(() => {
+    if (status !== 'authenticated') return;
+    setTestRunning(false);
+    setEndTime(Date.now());
+    const resultsObject = {
+      wpm: getWPM() ?? 0,
+      prompt: topic,
+    };
+    mutateResult(resultsObject);
+  }, [topic, getWPM, mutateResult, status]);
+
   const onType = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     if (
@@ -85,7 +111,7 @@ export default function Home() {
     } else {
       setInputValue(e.target.value);
     }
-  }, [typedWords, wordsToType, inputValue, score, currentWord]);
+  }, [typedWords, wordsToType, inputValue, score, currentWord, submitResult]);
 
   const renderContent = React.useCallback(() => {
     if (loading) {
@@ -124,40 +150,14 @@ export default function Home() {
     return (
       <div className='flex gap-1 w-full'>
         <button onClick={restartTest} className='bg-zinc-800 rounded p-2 grow'>Start</button>
-        <Link href='/results' className='bg-zinc-800 rounded py-2 px-5'>Results</Link>
       </div>
     );
   }, [testRunning, loading, inputValue, onType, restartTest]);
 
-  const getWPM = React.useCallback(() => {
-    if (!startTime) return;
-
-    let currentEndTime = Date.now();
-
-    if (!testRunning && endTime) {
-      currentEndTime = endTime;
-    }
-
-    const minutes = (currentEndTime - startTime) / 1000 / 60;
-    return Math.floor(score / 5 / minutes);
-  }, [score, startTime, endTime, testRunning]);
-
-  const submitResult = React.useCallback(() => {
-    setTestRunning(false);
-    setEndTime(Date.now());
-    const resultsObject = {
-      wpm: getWPM() ?? 0,
-      prompt: topic,
-    };
-    mutateResult(resultsObject);
-  }, [topic, getWPM, mutateResult]);
-
   return (
     <>
       <Head>
-        <title>GPT Typing Game</title>
         <meta name="description" content="A typing game that uses the GPT Api in order to generate topical texts." />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-center bg-zinc-900 text-zinc-100">
         <UserPortrait className="fixed top-5 right-5" />
