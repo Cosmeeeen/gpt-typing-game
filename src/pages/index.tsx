@@ -4,6 +4,10 @@ import Head from "next/head";
 import { getTypingTest, getWordScore } from '~/utils/typingTest';
 import Spinner from '~/components/Spinner';
 import Timer from '~/components/Timer';
+import Link from 'next/link';
+import { api } from '~/utils/api';
+import UserPortrait from '~/components/UserPortrait';
+import { useSession } from 'next-auth/react';
 
 const CurrentWord: React.FC<{ word: string | undefined, inputValue: string }> = ({ word, inputValue }) => {
   return (
@@ -41,8 +45,11 @@ export default function Home() {
 
   const inputRef = React.useRef<HTMLInputElement>(null);
 
+  const { mutate: mutateResult } = api.testResults.create.useMutation();
+  const { status } = useSession();
+
   const restartTest = React.useCallback(() => {
-    if(!loading) {
+    if (!loading) {
       setLoading(true);
       setTestRunning(false);
       getTypingTest({
@@ -64,14 +71,37 @@ export default function Home() {
     }
   }, [loading, inputRef, topic]);
 
+  const getWPM = React.useCallback(() => {
+    if (!startTime) return;
+
+    let currentEndTime = Date.now();
+
+    if (!testRunning && endTime) {
+      currentEndTime = endTime;
+    }
+
+    const minutes = (currentEndTime - startTime) / 1000 / 60;
+    return Math.floor(score / 5 / minutes);
+  }, [score, startTime, endTime, testRunning]);
+
+  const submitResult = React.useCallback(() => {
+    if (status !== 'authenticated') return;
+    setTestRunning(false);
+    setEndTime(Date.now());
+    const resultsObject = {
+      wpm: getWPM() ?? 0,
+      prompt: topic,
+    };
+    mutateResult(resultsObject);
+  }, [topic, getWPM, mutateResult, status]);
+
   const onType = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if(
-      (value.endsWith(' ') && value.trim() === currentWord) || 
+    if (
+      (value.endsWith(' ') && value.trim() === currentWord) ||
       (value.trim() === currentWord && wordsToType.length === 0)) {
-      if(wordsToType.length === 0) {
-        setTestRunning(false);
-        setEndTime(Date.now());
+      if (wordsToType.length === 0) {
+        submitResult();
       }
       setTypedWords([...typedWords, inputValue]);
       setScore(score + getWordScore(currentWord) + (value.endsWith(' ') ? 1 : 0));
@@ -81,16 +111,16 @@ export default function Home() {
     } else {
       setInputValue(e.target.value);
     }
-  }, [typedWords, wordsToType, inputValue, score, currentWord]);
+  }, [typedWords, wordsToType, inputValue, score, currentWord, submitResult]);
 
   const renderContent = React.useCallback(() => {
-    if(loading) {
+    if (loading) {
       return (
         <div className="bg-zinc-800 rounded w-full p-3 text-xl">
           <Spinner />
         </div>
       );
-    } 
+    }
     if (testRunning) {
       return (
         <div className="select-none bg-zinc-800 rounded w-full p-3 text-xl">
@@ -99,7 +129,7 @@ export default function Home() {
           <span className="">{wordsToType.map(word => word + ' ')}</span>
         </div>
       );
-    } 
+    }
 
     return (
       <div className="flex gap-1 w-full">
@@ -109,7 +139,7 @@ export default function Home() {
   }, [loading, testRunning, typedWords, currentWord, inputValue, wordsToType, topic]);
 
   const renderBottom = React.useCallback(() => {
-    if(testRunning || loading) {
+    if (testRunning || loading) {
       return (
         <div className='flex gap-1 w-full'>
           <input className='bg-zinc-800 focus:outline-none p-2 rounded grow' onChange={onType} value={inputValue} ref={inputRef} />
@@ -118,31 +148,19 @@ export default function Home() {
       );
     }
     return (
-      <button onClick={restartTest} className='bg-zinc-800 rounded p-2 w-full'>Start</button>
+      <div className='flex gap-1 w-full'>
+        <button onClick={restartTest} className='bg-zinc-800 rounded p-2 grow'>Start</button>
+      </div>
     );
   }, [testRunning, loading, inputValue, onType, restartTest]);
-
-  const getWPM = React.useCallback(() => {
-    if(!startTime) return;
-
-    let currentEndTime = Date.now();
-
-    if(!testRunning && endTime) {
-      currentEndTime = endTime;
-    }
-
-    const minutes = (currentEndTime - startTime) / 1000 / 60;
-    return Math.floor(score / 5 / minutes);
-  }, [score, startTime, endTime, testRunning]);
 
   return (
     <>
       <Head>
-        <title>GPT Typing Game</title>
         <meta name="description" content="A typing game that uses the GPT Api in order to generate topical texts." />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-center bg-zinc-900 text-zinc-100">
+        <UserPortrait className="fixed top-5 right-5" />
         <div className='flex flex-col w-1/2 gap-1'>
           <div className='grid gap-1 w-full grid-cols-2'>
             <div className='bg-zinc-800 rounded p-2 text-center'>Time: <Timer startTime={startTime} endTime={endTime} running={testRunning} /></div>
