@@ -7,10 +7,12 @@ import defaultPortrait from '../data/defaultPortrait.png';
 import { useRouter } from 'next/router';
 import ResultsTable from '~/components/ResultsTable';
 import Link from 'next/link';
+import { api } from '~/utils/api';
 
 const ProfilePage = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const { data: userTestCount } = api.testResults.getUserTotal.useQuery({ userId: session?.user.id });
 
   const renderProfile = React.useCallback(() => {
     if (status === 'loading') {
@@ -40,11 +42,12 @@ const ProfilePage = () => {
         <div className='flex-fill grow bg-zinc-800 rounded flex flex-col justify-around items-left gap-2 p-5'>
           <p>Name: {session.user.name}</p>
           <p>Email: {session.user.email}</p>
+          <p>Tests taken: {userTestCount}</p>
           <a onClick={() => void signOut()} className="underline cursor-pointer">Log out</a>
         </div>
       </div>
     );
-  }, [status, session, router]);
+  }, [status, session, router, userTestCount]);
 
   return (
     <>

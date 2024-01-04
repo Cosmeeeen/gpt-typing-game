@@ -7,22 +7,30 @@ import { api } from "~/utils/api";
 import { useSession } from "next-auth/react";
 
 const ResultsTable: React.FC = () => {
-  const [loading, setLoading] = React.useState<boolean>(true);
   const [results, setResults] = React.useState<TestResult[]>([]);
-  const { data: session, status } = useSession();
-  const { data } = api.testResults.getByUser.useQuery({ userId: session?.user.id });
+  const [page, setPage] = React.useState<number>(1);
+  const { data: session, status: sessionStatus } = useSession();
+  const { data, status } = api.testResults.getByUser.useQuery({ userId: session?.user.id, page, take: 10 });
 
   React.useEffect(() => {
     if (!data) {
       return;
     }
-    setResults(data);
-    setLoading(false);
+    setResults(data.items);
   }, [data]);
 
+  React.useEffect(() => {
+    if (data && page > data?.pagesTotal) {
+      setPage(data.pagesTotal);
+    }
+  }, [page, data]);
+
   const renderResults = React.useCallback(() => {
-    if (results.length === 0 || !session) {
+    if (results.length === 0 || sessionStatus === 'unauthenticated' || status === 'error') {
       return null;
+    }
+    if (sessionStatus === 'loading' || status === 'loading') {
+      return <Spinner />;
     }
     return (
       <table className='border-separate border-spacing-y-1'>
@@ -40,20 +48,40 @@ const ResultsTable: React.FC = () => {
         ))}
       </table>
     );
-  }, [results, session]);
+  }, [results, sessionStatus, status]);
 
-  if (status === 'loading' || status === 'unauthenticated') return;
+  const nextPage = React.useCallback(() => {
+    if (!data) return;
+    if (page + 1 > data?.pagesTotal) return;
+    setPage(page + 1);
+  }, [page, data]);
+
+  const previousPage = React.useCallback(() => {
+    if (!data) return;
+    if (page - 1 < 1) return;
+    setPage(page - 1);
+  }, [page, data]);
+
+  const renderPagination = React.useCallback(() => {
+    if (results.length === 0 || !session) {
+      return null;
+    }
+    return (
+      <div className="flex flex-row gap-1">
+        <button className="w-10 h-10 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors" onClick={previousPage}>{'<'}</button>
+        <p className="rounded bg-zinc-800 grow text-center flex items-center justify-center">Page {page} of {data?.pagesTotal}</p>
+        <button className="w-10 h-10 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors" onClick={nextPage}>{'>'}</button>
+      </div>
+    );
+  }, [session, results, data, page, nextPage, previousPage]);
+
+  if (sessionStatus === 'unauthenticated') return;
 
   return (
-    <>
-      {loading ? (
-        <Spinner />
-      ) : (
-        <div className='flex flex-col w-full gap-1'>
-          {renderResults()}
-        </div>
-      )}
-    </>
+    <div className='flex flex-col w-full gap-1'>
+      {renderResults()}
+      {renderPagination()}
+    </div>
   );
 }
 
