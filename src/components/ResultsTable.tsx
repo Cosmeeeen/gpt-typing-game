@@ -50,17 +50,11 @@ const ResultsTable: React.FC = () => {
     );
   }, [results, sessionStatus, status]);
 
-  const nextPage = React.useCallback(() => {
+  const goToPage = React.useCallback((pageNumber: number) => {
     if (!data) return;
-    if (page + 1 > data?.pagesTotal) return;
-    setPage(page + 1);
-  }, [page, data]);
-
-  const previousPage = React.useCallback(() => {
-    if (!data) return;
-    if (page - 1 < 1) return;
-    setPage(page - 1);
-  }, [page, data]);
+    if (pageNumber < 1 || pageNumber > data?.pagesTotal) return;
+    setPage(pageNumber);
+  }, [data]);
 
   const renderPagination = React.useCallback(() => {
     if (results.length === 0 || !session) {
@@ -68,12 +62,14 @@ const ResultsTable: React.FC = () => {
     }
     return (
       <div className="flex flex-row gap-1">
-        <button className="w-10 h-10 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors" onClick={previousPage}>{'<'}</button>
+        <button className="w-10 h-10 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors" onClick={() => goToPage(1)}>{'<<'}</button>
+        <button className="w-10 h-10 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors" onClick={() => goToPage(page - 1)}>{'<'}</button>
         <p className="rounded bg-zinc-800 grow text-center flex items-center justify-center">Page {page} of {data?.pagesTotal}</p>
-        <button className="w-10 h-10 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors" onClick={nextPage}>{'>'}</button>
+        <button className="w-10 h-10 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors" onClick={() => goToPage(page + 1)}>{'>'}</button>
+        <button className="w-10 h-10 rounded bg-zinc-800 hover:bg-zinc-700 transition-colors" onClick={() => goToPage(data?.pagesTotal ?? 1)}>{'>>'}</button>
       </div>
     );
-  }, [session, results, data, page, nextPage, previousPage]);
+  }, [session, results, data, page, goToPage]);
 
   if (sessionStatus === 'unauthenticated') return;
 
