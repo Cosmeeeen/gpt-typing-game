@@ -168,6 +168,7 @@ export default function Home() {
           </div>
           {renderContent()}
           {renderBottom()}
+          <Link href='/about' className='fixed bottom-5 left-5 text-3xl w-10 h-10 hover:text-zinc-300 hover:border-zinc-300 rounded-full border-zinc-100 border-4 flex justify-center items-center'>?</Link>
         </div>
       </main>
     </>
