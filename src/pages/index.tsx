@@ -132,9 +132,10 @@ export default function Home() {
     }
 
     return (
-      <div className="flex gap-1 w-full">
-        <input type="text" className='bg-zinc-800 focus:outline-none p-2 rounded grow text-center italic' maxLength={30} value={topic} onChange={e => setTopic(e.target.value)} placeholder="Topic..." />
-      </div>
+      <div className="flex gap-1 w-full bg-zinc-800 rounded">
+        <input type="text" className='focus:outline-none p-2 bg-transparent grow text-center italic' maxLength={50} value={topic} onChange={e => setTopic(e.target.value)} placeholder="Topic..." />
+        <p className="relative right-3 top-3 text-xs h-fit text-zinc-500">{topic.length}/50</p>
+      </div >
     );
   }, [loading, testRunning, typedWords, currentWord, inputValue, wordsToType, topic]);
 

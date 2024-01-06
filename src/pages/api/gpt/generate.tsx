@@ -3,6 +3,8 @@ import OpenAI from 'openai';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { ChatCompletionMessageParam } from 'openai/resources';
 
+import systemMessage from '../../../data/systemMessage.json';
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
     res.status(405).json({ message: 'Method not allowed' });
@@ -18,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const messages = [
       {
         role: 'system',
-        content: 'Generate a short paragraph based on the user-provided topic. The response should be in a formal and informative style, resembling a well-researched article or encyclopedia entry. Do not include any conversational prompts, and avoid using informal language. Assume that the user is seeking informative and concise content related to the topic. Ensure that the paragraph is well-structured, coherent, and engaging. If necessary, provide background information or context about the topic. Please use proper grammar, punctuation, and language conventions.'
+        content: systemMessage
       }
     ];
 
@@ -33,7 +35,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       model: 'gpt-3.5-turbo',
       messages: messages as ChatCompletionMessageParam[],
       temperature: 1,
-      max_tokens: tokens ? parseInt(tokens as string) : 100,
+      max_tokens: tokens ? parseInt(tokens as string) : 300,
       top_p: 1,
       frequency_penalty: 0,
       presence_penalty: 0,
