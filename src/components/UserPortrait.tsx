@@ -4,14 +4,21 @@ import * as React from 'react';
 import defaultPortrait from '../data/defaultPortrait.png';
 import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
+import Spinner from './Spinner';
 
 interface UserPortraitProps {
   className?: string;
 };
 
 const UserPortrait: React.FC<UserPortraitProps> = ({ className }) => {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
+
+  if (status === 'loading') return (
+    <div className={className + ' flex justify-row justify-center items-center gap-3'}>
+      <Spinner />
+    </div>
+  );
 
   return (
     <div className={className + ' flex justify-row justify-center items-center gap-3'}>
