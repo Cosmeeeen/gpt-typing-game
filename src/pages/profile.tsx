@@ -13,6 +13,7 @@ const ProfilePage = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
   const { data: userTestCount } = api.testResults.getUserTotal.useQuery({ userId: session?.user.id });
+  const { data: userWPM } = api.testResults.getUserWPM.useQuery({ userId: session?.user.id });
 
   const renderProfile = React.useCallback(() => {
     if (status === 'loading') {
@@ -43,11 +44,12 @@ const ProfilePage = () => {
           <p>Name: {session.user.name}</p>
           <p>Email: {session.user.email}</p>
           <p>Tests taken: {userTestCount}</p>
+          <p>Average WPM (10 races): {userWPM}</p>
           <a onClick={() => void signOut()} className="underline cursor-pointer">Log out</a>
         </div>
       </div>
     );
-  }, [status, session, router, userTestCount]);
+  }, [status, session, router, userTestCount, userWPM]);
 
   return (
     <>
