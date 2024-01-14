@@ -10,10 +10,15 @@ import Link from 'next/link';
 import { api } from '~/utils/api';
 
 const ProfilePage = () => {
-  const { data: session, status } = useSession();
+  const { data: session, status, update: updateSession } = useSession();
   const router = useRouter();
-  const { data: userTestCount } = api.testResults.getUserTotal.useQuery({ userId: session?.user.id });
   const { data: userWPM } = api.testResults.getUserWPM.useQuery({ userId: session?.user.id });
+
+  // This will ensure that the users's testsTaken is up to date
+  React.useEffect(() => {
+    void updateSession();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const renderProfile = React.useCallback(() => {
     if (status === 'loading') {
@@ -43,13 +48,13 @@ const ProfilePage = () => {
         <div className='flex-fill grow bg-zinc-800 rounded flex flex-col justify-around items-left gap-2 p-5'>
           <p>Name: {session.user.name}</p>
           <p>Email: {session.user.email}</p>
-          <p>Tests taken: {userTestCount}</p>
+          <p>Tests taken: {session.user.testsTaken}</p>
           <p>Average WPM (10 races): {userWPM}</p>
           <a onClick={() => void signOut()} className="underline cursor-pointer">Log out</a>
         </div>
       </div>
     );
-  }, [status, session, router, userTestCount, userWPM]);
+  }, [status, session, router, userWPM]);
 
   return (
     <>

@@ -34,19 +34,6 @@ export const testResultsRouter = createTRPCRouter({
     });
     return { items, pagesTotal };
   }),
-  getUserTotal: publicProcedure.input(z.object({
-    userId: z.string().optional(),
-  })).query(({ ctx, input }) => {
-    const { userId } = input;
-    if (!userId) {
-      return null;
-    }
-    return ctx.db.testResult.count({
-      where: {
-        userId,
-      },
-    });
-  }),
   getUserWPM: publicProcedure.input(z.object({
     userId: z.string().optional(),
   })).query(async ({ ctx, input }) => {
@@ -83,17 +70,35 @@ export const testResultsRouter = createTRPCRouter({
   create: publicProcedure.input(z.object({
     wpm: z.number(),
     prompt: z.string(),
-  })).mutation(({ ctx, input }) => {
+  })).mutation(async ({ ctx, input }) => {
     const { wpm, prompt } = input;
     const userId = ctx.session?.user.id;
 
-    return ctx.db.testResult.create({
-      data: {
-        wpm,
-        prompt,
-        finishedAt: new Date(),
-        userId,
-      },
-    });
+    try { 
+      const createdResult = await ctx.db.testResult.create({
+        data: {
+          wpm,
+          prompt,
+          finishedAt: new Date(),
+          userId,
+        },
+      });
+
+      await ctx.db.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          testsTaken: {
+            increment: 1,
+          },
+        }
+      });
+
+      return createdResult;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
   })
 });
