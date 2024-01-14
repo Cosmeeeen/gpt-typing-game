@@ -45,8 +45,12 @@ export default function Home() {
 
   const inputRef = React.useRef<HTMLInputElement>(null);
 
-  const { mutate: mutateResult } = api.testResults.create.useMutation();
-  const { status } = useSession();
+  const { mutate: mutateResult } = api.testResults.create.useMutation({
+    onSuccess: () => {
+      void updateSession();
+    },
+  });
+  const { status, update: updateSession } = useSession();
 
   const restartTest = React.useCallback(() => {
     if (!loading) {

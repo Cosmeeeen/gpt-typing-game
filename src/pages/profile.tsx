@@ -14,12 +14,6 @@ const ProfilePage = () => {
   const router = useRouter();
   const { data: userWPM } = api.testResults.getUserWPM.useQuery({ userId: session?.user.id });
 
-  // This will ensure that the users's testsTaken is up to date
-  React.useEffect(() => {
-    void updateSession();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const renderProfile = React.useCallback(() => {
     if (status === 'loading') {
       return <Spinner />;

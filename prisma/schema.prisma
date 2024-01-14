@@ -56,8 +56,6 @@ model User {
     emailVerified DateTime?
     image         String?
     testsTaken    Int       @default(0)
-    // todo remember to delete this comment and run the following query on first deploy: 
-    // UPDATE User SET testsTaken=(SELECT COUNT(id) FROM TestResult WHERE TestResult.userId=User.id) WHERE testsTaken=0;
     accounts      Account[]
     sessions      Session[]
 }
