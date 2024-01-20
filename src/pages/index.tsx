@@ -55,6 +55,8 @@ export default function Home() {
   const restartTest = React.useCallback(() => {
     if (!loading) {
       setLoading(true);
+      setStartTime(undefined);
+      setEndTime(undefined);
       setTestRunning(false);
       getTypingTest({
         topic,
@@ -66,7 +68,6 @@ export default function Home() {
         setInputValue('');
         setLoading(false);
         setTestRunning(true);
-        setStartTime(Date.now());
         inputRef?.current?.focus();
       }).catch(err => {
         setTestRunning(false);
@@ -97,10 +98,15 @@ export default function Home() {
       prompt: topic,
     };
     mutateResult(resultsObject);
+    setStartTime(undefined);
+    setEndTime(undefined);
   }, [topic, getWPM, mutateResult, status]);
 
   const onType = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
+    if (testRunning && !startTime) {
+      setStartTime(Date.now());
+    }
     if (
       (value.endsWith(' ') && value.trim() === currentWord) ||
       (value.trim() === currentWord && wordsToType.length === 0)) {
@@ -115,7 +121,7 @@ export default function Home() {
     } else {
       setInputValue(e.target.value);
     }
-  }, [typedWords, wordsToType, inputValue, score, currentWord, submitResult]);
+  }, [typedWords, wordsToType, inputValue, score, currentWord, submitResult, startTime, testRunning]);
 
   const renderContent = React.useCallback(() => {
     if (loading) {

@@ -8,15 +8,14 @@ interface TimerProps {
 
 const Timer: React.FC<TimerProps> = ({ startTime, endTime, running }) => {
   const [time, setTime] = React.useState<number>(0);
-  
+
   React.useEffect(() => {
-    if(!startTime) return;
-    if(!running && endTime) {
-      setTime(endTime - startTime);
+    if (!running || !startTime) {
+      setTime(0);
       return;
     }
-    if(!running) {
-      setTime(0);
+    if (!running && endTime) {
+      setTime(endTime - startTime);
       return;
     }
 
@@ -35,7 +34,7 @@ const Timer: React.FC<TimerProps> = ({ startTime, endTime, running }) => {
     return `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
   }, [time]);
 
-  if(!running && !endTime) return null;
+  if (!running && !endTime) return null;
   return (
     <span>{renderTime()}</span>
   );
