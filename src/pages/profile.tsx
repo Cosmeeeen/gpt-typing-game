@@ -37,7 +37,7 @@ const ProfilePage = () => {
           width={200}
           height={200}
           alt="User's profile picture"
-          className="rounded-full bg-zinc-800 border-4 aspect-square"
+          className="rounded-full bg-zinc-800 border-4 h-fit w-fit"
         />
         <div className='flex-fill grow bg-zinc-800 rounded flex flex-col justify-around items-left gap-2 p-5'>
           <p>Name: {session.user.name}</p>
