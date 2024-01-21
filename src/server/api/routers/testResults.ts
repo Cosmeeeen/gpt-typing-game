@@ -72,7 +72,11 @@ export const testResultsRouter = createTRPCRouter({
     prompt: z.string(),
   })).mutation(async ({ ctx, input }) => {
     const { wpm, prompt } = input;
+
     const userId = ctx.session?.user.id;
+  
+    const currentBestWpm = ctx.session?.user.bestWpm;  
+    const bestWpm = currentBestWpm ? Math.max(currentBestWpm, wpm) : wpm;
 
     try { 
       const createdResult = await ctx.db.testResult.create({
@@ -92,6 +96,7 @@ export const testResultsRouter = createTRPCRouter({
           testsTaken: {
             increment: 1,
           },
+          bestWpm,
         }
       });
 

@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { api } from '~/utils/api';
 
 const ProfilePage = () => {
-  const { data: session, status, update: updateSession } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
   const { data: userWPM } = api.testResults.getUserWPM.useQuery({ userId: session?.user.id });
 
@@ -37,13 +37,14 @@ const ProfilePage = () => {
           width={200}
           height={200}
           alt="User's profile picture"
-          className="rounded-full bg-zinc-800 border-4 "
+          className="rounded-full bg-zinc-800 border-4 aspect-square"
         />
         <div className='flex-fill grow bg-zinc-800 rounded flex flex-col justify-around items-left gap-2 p-5'>
           <p>Name: {session.user.name}</p>
           <p>Email: {session.user.email}</p>
           <p>Tests taken: {session.user.testsTaken}</p>
           <p>Average WPM (10 races): {userWPM}</p>
+          <p>Best WPM: {session.user.bestWpm}</p>
           <a onClick={() => void signOut()} className="underline cursor-pointer">Log out</a>
         </div>
       </div>
