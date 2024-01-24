@@ -133,7 +133,7 @@ export default function Home() {
     }
     if (testRunning) {
       return (
-        <div className="select-none bg-zinc-800 rounded w-full p-3 text-xl">
+        <div className="select-none bg-zinc-800 rounded w-full p-3 text-xl overflow-hidden">
           <span className="text-green-500">{typedWords.map(word => word + ' ')}</span>
           <CurrentWord word={currentWord} inputValue={inputValue} />{' '}
           <span className="">{wordsToType.map(word => word + ' ')}</span>

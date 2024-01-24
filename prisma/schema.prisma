@@ -56,8 +56,6 @@ model User {
     emailVerified DateTime?
     image         String?
     testsTaken    Int       @default(0)
-    // TODO run the following query on first deploy: 
-    // UPDATE User SET bestWpm = (SELECT wpm FROM TestResult WHERE TestResult.userId=User.id ORDER BY wpm DESC LIMIT 1);
     bestWpm       Int       @default(0)
     accounts      Account[]
     sessions      Session[]

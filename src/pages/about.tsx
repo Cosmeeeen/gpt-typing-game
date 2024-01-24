@@ -1,10 +1,10 @@
-import Link from 'next/link';
 import * as React from 'react';
+import HomeButton from '~/components/HomeButton';
 
 const AboutPage = () => {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-zinc-900 text-zinc-100 gap-1">
-      <Link href="/" className='fixed top-5 left-5 text-5xl px-3 py-3 hover:text-zinc-300'>{'<'}</Link>
+    <main className="flex min-h-screen flex-col items-center justify-center text-center bg-zinc-900 text-zinc-100 gap-1">
+      <HomeButton />
       <h1 className="text-3xl">GPT Typing Game</h1>
       <p>A game by <a href='https://www.cosmin.zip/' className='underline' target='_blank'>Cosmin Ilie</a></p>
       <p>Powered by <a href='https://openai.com/' className='underline' target='_blank'>OpenAI</a>&apos;s GPT-3.5-turbo model</p>
