@@ -1,14 +1,14 @@
 import * as React from 'react';
 
 import Head from "next/head";
+import Link from 'next/link';
+import { Info, X } from 'react-feather';
+
 import { getTypingTest, getWordScore } from '~/utils/typingTest';
 import Spinner from '~/components/Spinner';
 import Timer from '~/components/Timer';
-import Link from 'next/link';
 import { api } from '~/utils/api';
 import UserPortrait from '~/components/UserPortrait';
-import { useSession } from 'next-auth/react';
-import { Info } from 'react-feather';
 
 const CurrentWord: React.FC<{ word: string | undefined, inputValue: string }> = ({ word, inputValue }) => {
   return (
@@ -97,9 +97,14 @@ export default function Home() {
     return Math.floor((currentEndTime - startTime) / 1000);
   }, [startTime, endTime, testRunning]);
 
-  const submitResult = React.useCallback((finalScore: number) => {
+  const endTest = React.useCallback(() => {
     setTestRunning(false);
     setEndTime(Date.now());
+    setInputValue('');
+  }, []);
+
+  const submitResult = React.useCallback((finalScore: number) => {
+    endTest();
     const resultsObject = {
       wpm: getWPM(finalScore) ?? 0,
       time: getTime() ?? 0,
@@ -107,10 +112,7 @@ export default function Home() {
       prompt: topic,
     };
     mutateResult(resultsObject);
-    setStartTime(undefined);
-    setEndTime(undefined);
-    setScore(0);
-  }, [topic, getWPM, mutateResult, getTime]);
+  }, [topic, getWPM, mutateResult, getTime, endTest]);
 
   const onType = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -165,7 +167,9 @@ export default function Home() {
       return (
         <div className='flex gap-1 w-full'>
           <input className='bg-zinc-800 focus:outline-none p-2 rounded grow' onChange={onType} value={inputValue} ref={inputRef} />
-          <button onClick={restartTest} className='bg-zinc-800 rounded p-2'>Restart</button>
+          <button onClick={endTest} className='bg-zinc-800 rounded p-2'>
+            <X />
+          </button>
         </div>
       );
     }
@@ -174,7 +178,7 @@ export default function Home() {
         <button onClick={restartTest} className='bg-zinc-800 rounded p-2 grow'>Start</button>
       </div>
     );
-  }, [testRunning, loading, inputValue, onType, restartTest]);
+  }, [testRunning, loading, inputValue, onType, restartTest, endTest]);
 
   return (
     <>

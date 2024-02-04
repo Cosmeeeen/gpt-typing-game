@@ -10,11 +10,11 @@ const Timer: React.FC<TimerProps> = ({ startTime, endTime, running }) => {
   const [time, setTime] = React.useState<number>(0);
 
   React.useEffect(() => {
-    if (!running || !startTime) {
+    if (!startTime) {
       setTime(0);
       return;
     }
-    if (!running && endTime) {
+    if (endTime) {
       setTime(endTime - startTime);
       return;
     }
@@ -26,7 +26,7 @@ const Timer: React.FC<TimerProps> = ({ startTime, endTime, running }) => {
     return () => {
       clearInterval(interval);
     };
-  }, [startTime, endTime, running]);
+  }, [startTime, endTime]);
 
   const renderTime = React.useCallback(() => {
     const seconds = Math.floor(time / 1000 % 60);
