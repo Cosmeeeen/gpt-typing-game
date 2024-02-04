@@ -8,7 +8,7 @@ import HomeButton from '~/components/HomeButton';
 import Spinner from '~/components/Spinner';
 
 const TopWpmPage = () => {
-  const { isLoading, data: topUsers } = api.user.topScore.useQuery();
+  const { isLoading, data: topUsers } = api.users.topScore.useQuery();
   const { data: session } = useSession();
 
   return (

@@ -10,7 +10,7 @@ import { githubRouter } from "./routers/github";
  */
 export const appRouter = createTRPCRouter({
   testResults: testResultsRouter,
-  user: userRouter,
+  users: userRouter,
   github: githubRouter,
 });
 

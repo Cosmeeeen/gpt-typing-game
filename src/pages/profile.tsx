@@ -13,6 +13,7 @@ const ProfilePage = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
   const { data: userWPM } = api.testResults.getUserWPM.useQuery({ userId: session?.user.id });
+  const { data: userDetails } = api.users.userDetails.useQuery({ id: session?.user.id ?? '' });
 
   const renderProfile = React.useCallback(() => {
     if (status === 'loading') {
@@ -42,15 +43,15 @@ const ProfilePage = () => {
         <div className='flex-fill grow bg-zinc-800 rounded flex flex-col justify-around items-left gap-2 p-5'>
           <p>Name: {session.user.name}</p>
           <p>Email: {session.user.email}</p>
-          <p>Tests taken: {session.user.testsTaken}</p>
+          <p>Tests taken: {userDetails ? userDetails.testsTaken : 0}</p>
           <p>Average WPM (10 races): {userWPM}</p>
-          <p>Best WPM: {session.user.bestWpm}</p>
-          <p>Total score: {session.user.totalScore}</p>
+          <p>Best WPM: {userDetails ? userDetails.bestWpm : 0}</p>
+          <p>Total score: {userDetails ? userDetails.totalScore : 0}</p>
           <a onClick={() => void signOut()} className="underline cursor-pointer">Log out</a>
         </div>
       </div>
     );
-  }, [status, session, router, userWPM]);
+  }, [status, session, router, userWPM, userDetails]);
 
   return (
     <>

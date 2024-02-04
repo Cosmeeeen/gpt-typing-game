@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { createTRPCRouter, publicProcedure } from '~/server/api/trpc';
 
 export const userRouter = createTRPCRouter({
@@ -15,4 +16,14 @@ export const userRouter = createTRPCRouter({
       take: 5,
     });
   }),
+  userDetails: publicProcedure.input(z.object({
+    id: z.string(),
+  })).query(({ ctx, input }) => {
+    const { id } = input;
+
+    return ctx.db.user.findUnique({
+      where: { id },
+      select: { id: true, name: true, image: true, bestWpm: true, totalScore: true, testsTaken: true },
+    });
+  })
 });
