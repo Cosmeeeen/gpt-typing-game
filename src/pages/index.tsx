@@ -57,6 +57,7 @@ export default function Home() {
       setLoading(true);
       setStartTime(undefined);
       setEndTime(undefined);
+      setScore(0);
       setTestRunning(false);
       getTypingTest({
         topic,
@@ -75,7 +76,7 @@ export default function Home() {
     }
   }, [loading, inputRef, topic]);
 
-  const getWPM = React.useCallback(() => {
+  const getWPM = React.useCallback((currentScore: number) => {
     if (!startTime) return;
 
     let currentEndTime = Date.now();
@@ -85,8 +86,8 @@ export default function Home() {
     }
 
     const minutes = (currentEndTime - startTime) / 1000 / 60;
-    return Math.floor(score / 5 / minutes);
-  }, [score, startTime, endTime, testRunning]);
+    return Math.floor(currentScore / 5 / minutes);
+  }, [startTime, endTime, testRunning]);
 
   const getTime = React.useCallback(() => {
     if (!startTime) return;
@@ -100,20 +101,20 @@ export default function Home() {
     return Math.floor((currentEndTime - startTime) / 1000);
   }, [startTime, endTime, testRunning]);
 
-  const submitResult = React.useCallback(() => {
+  const submitResult = React.useCallback((finalScore: number) => {
     setTestRunning(false);
     setEndTime(Date.now());
     const resultsObject = {
-      wpm: getWPM() ?? 0,
+      wpm: getWPM(finalScore) ?? 0,
       time: getTime() ?? 0,
-      score: Math.floor(score / 5),
+      score: Math.floor(finalScore / 5),
       prompt: topic,
     };
     mutateResult(resultsObject);
     setStartTime(undefined);
     setEndTime(undefined);
     setScore(0);
-  }, [topic, getWPM, mutateResult, score, getTime]);
+  }, [topic, getWPM, mutateResult, getTime]);
 
   const onType = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -123,14 +124,15 @@ export default function Home() {
     if (
       (value.endsWith(' ') && value.trim() === currentWord) ||
       (value.trim() === currentWord && wordsToType.length === 0)) {
-      if (wordsToType.length === 0) {
-        submitResult();
-      }
       setTypedWords([...typedWords, inputValue]);
-      setScore(score + getWordScore(currentWord) + (value.endsWith(' ') ? 1 : 0));
+      const currentScore = score + getWordScore(currentWord) + (value.endsWith(' ') ? 1 : 0);
+      setScore(currentScore);
       setCurrentWord(wordsToType[0]);
       setWordsToType(wordsToType.slice(1));
       setInputValue('');
+      if (wordsToType.length === 0) {
+        submitResult(currentScore);
+      }
     } else {
       setInputValue(e.target.value);
     }
@@ -188,7 +190,7 @@ export default function Home() {
         <div className='flex flex-col w-1/2 gap-1'>
           <div className='grid gap-1 w-full grid-cols-2'>
             <div className='bg-zinc-800 rounded p-2 text-center'>Time: <Timer startTime={startTime} endTime={endTime} running={testRunning} /></div>
-            <div className='bg-zinc-800 rounded p-2 text-center'>WPM: {getWPM()}</div>
+            <div className='bg-zinc-800 rounded p-2 text-center'>WPM: {getWPM(score)}</div>
           </div>
           {renderContent()}
           {renderBottom()}
