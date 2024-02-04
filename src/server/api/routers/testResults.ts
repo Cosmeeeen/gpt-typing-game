@@ -69,36 +69,45 @@ export const testResultsRouter = createTRPCRouter({
   }),
   create: publicProcedure.input(z.object({
     wpm: z.number(),
+    score: z.number(),
+    time: z.number(),
     prompt: z.string(),
   })).mutation(async ({ ctx, input }) => {
-    const { wpm, prompt } = input;
+    const { wpm, prompt, score, time } = input;
 
     const userId = ctx.session?.user.id;
   
     const currentBestWpm = ctx.session?.user.bestWpm;  
     const bestWpm = currentBestWpm ? Math.max(currentBestWpm, wpm) : wpm;
+    
+    const totalScore = (parseInt(ctx.session?.user.totalScore ?? '0', 10) + score).toString();
 
     try { 
       const createdResult = await ctx.db.testResult.create({
         data: {
           wpm,
+          score,
+          time,
           prompt,
           finishedAt: new Date(),
           userId,
         },
       });
 
-      await ctx.db.user.update({
-        where: {
-          id: userId,
-        },
-        data: {
-          testsTaken: {
-            increment: 1,
+      if (userId) {
+        await ctx.db.user.update({
+          where: {
+            id: userId,
           },
-          bestWpm,
-        }
-      });
+          data: {
+            testsTaken: {
+              increment: 1,
+            },
+            bestWpm,
+            totalScore,
+          }
+        });
+      }
 
       return createdResult;
     } catch (e) {

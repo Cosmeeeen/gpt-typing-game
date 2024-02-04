@@ -8,10 +8,11 @@ export const userRouter = createTRPCRouter({
       take: 10,
     });
   }),
-  topTestsTaken: publicProcedure.query(({ ctx }) => {
+  topScore: publicProcedure.query(({ ctx }) => {
     return ctx.db.user.findMany({
-      orderBy: { testsTaken: 'desc' },
-      take: 5
+      select: { id: true, name: true, image: true, totalScore: true },
+      orderBy: { totalScore: 'desc' },
+      take: 5,
     });
   }),
 });

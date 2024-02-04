@@ -8,13 +8,13 @@ import HomeButton from '~/components/HomeButton';
 import Spinner from '~/components/Spinner';
 
 const TopWpmPage = () => {
-  const { isLoading, data: topUsers } = api.user.topWpm.useQuery();
+  const { isLoading, data: topUsers } = api.user.topScore.useQuery();
   const { data: session } = useSession();
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-zinc-900 text-zinc-100">
       <HomeButton />
-      Users With The Highest All-Time WPM
+      Users With The Highest Score
       <div className="flex flex-col w-full md:w-1/2 gap-2">
         {isLoading ?
           (<Spinner />) :
@@ -29,7 +29,7 @@ const TopWpmPage = () => {
                 className='rounded-full'
               />
               <p className="grow">{user.name}</p>
-              <p>{user.bestWpm}</p>
+              <p>{user.totalScore}</p>
             </div>
           )
           )}

@@ -45,6 +45,7 @@ const ProfilePage = () => {
           <p>Tests taken: {session.user.testsTaken}</p>
           <p>Average WPM (10 races): {userWPM}</p>
           <p>Best WPM: {session.user.bestWpm}</p>
+          <p>Total score: {session.user.totalScore}</p>
           <a onClick={() => void signOut()} className="underline cursor-pointer">Log out</a>
         </div>
       </div>

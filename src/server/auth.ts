@@ -22,6 +22,7 @@ declare module "next-auth" {
       id: string;
       testsTaken: number;
       bestWpm: number;
+      totalScore: string;
       // ...other properties
       // role: UserRole;
     };
@@ -32,6 +33,7 @@ declare module "next-auth" {
     // role: UserRole;
     testsTaken: number;
     bestWpm: number;
+    totalScore: string;
   }
 }
 
@@ -48,6 +50,7 @@ export const authOptions: NextAuthOptions = {
         ...session.user,
         testsTaken: user.testsTaken,
         bestWpm: user.bestWpm,
+        totalScore: user.totalScore,
         id: user.id,
       },
     }),

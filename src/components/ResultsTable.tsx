@@ -36,14 +36,18 @@ const ResultsTable: React.FC = () => {
       <table className='border-separate border-spacing-y-1'>
         <tr className='bg-zinc-800'>
           <th className='p-2 rounded-l'>Prompt</th>
-          <th className='p-2 border-x-2 border-zinc-700'>Finished At</th>
-          <th className='p-2 rounded-r'>WPM</th>
+          <th className='p-2 border-l-2 border-zinc-700'>WPM</th>
+          <th className='p-2 border-l-2 border-zinc-700'>Score</th>
+          <th className='p-2 border-x-2 border-zinc-700'>Time</th>
+          <th className='p-2 rounded-r'>Finished At</th>
         </tr>
         {results.map(result => (
           <tr key={result.id} className="text-center bg-zinc-800 hover:bg-zinc-700 transition-colors">
             <td className='p-2 rounded-l'>{result.prompt}</td>
-            <td className='p-2 border-x-2 border-zinc-700'>{moment(result.finishedAt).fromNow()}</td>
-            <td className='p-2 rounded-r'>{result.wpm}</td>
+            <td className='p-2 border-l-2 border-zinc-700'>{result.wpm}</td>
+            <td className='p-2 border-l-2 border-zinc-700'>{result.score}</td>
+            <td className='p-2 border-x-2 border-zinc-700'>{result.time}s</td>
+            <td className='p-2 rounded-r'>{moment(result.finishedAt).fromNow()}</td>
           </tr>
         ))}
       </table>

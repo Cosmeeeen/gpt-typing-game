@@ -50,7 +50,7 @@ export default function Home() {
       void updateSession();
     },
   });
-  const { status, update: updateSession } = useSession();
+  const { update: updateSession } = useSession();
 
   const restartTest = React.useCallback(() => {
     if (!loading) {
@@ -61,7 +61,6 @@ export default function Home() {
       getTypingTest({
         topic,
       }).then(res => {
-        setScore(0);
         setTypedWords([]);
         setCurrentWord(res.split(' ')[0]);
         setWordsToType(res.split(' ').slice(1));
@@ -89,18 +88,32 @@ export default function Home() {
     return Math.floor(score / 5 / minutes);
   }, [score, startTime, endTime, testRunning]);
 
+  const getTime = React.useCallback(() => {
+    if (!startTime) return;
+
+    let currentEndTime = Date.now();
+
+    if (!testRunning && endTime) {
+      currentEndTime = endTime;
+    }
+
+    return Math.floor((currentEndTime - startTime) / 1000);
+  }, [startTime, endTime, testRunning]);
+
   const submitResult = React.useCallback(() => {
-    if (status !== 'authenticated') return;
     setTestRunning(false);
     setEndTime(Date.now());
     const resultsObject = {
       wpm: getWPM() ?? 0,
+      time: getTime() ?? 0,
+      score: Math.floor(score / 5),
       prompt: topic,
     };
     mutateResult(resultsObject);
     setStartTime(undefined);
     setEndTime(undefined);
-  }, [topic, getWPM, mutateResult, status]);
+    setScore(0);
+  }, [topic, getWPM, mutateResult, score, getTime]);
 
   const onType = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
