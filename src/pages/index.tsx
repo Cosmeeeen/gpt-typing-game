@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { api } from '~/utils/api';
 import UserPortrait from '~/components/UserPortrait';
 import { useSession } from 'next-auth/react';
+import { Info } from 'react-feather';
 
 const CurrentWord: React.FC<{ word: string | undefined, inputValue: string }> = ({ word, inputValue }) => {
   return (
@@ -189,7 +190,9 @@ export default function Home() {
           </div>
           {renderContent()}
           {renderBottom()}
-          <Link href='/about' className='fixed bottom-5 left-5 text-3xl w-10 h-10 hover:text-zinc-300 hover:border-zinc-300 rounded-full border-zinc-100 border-4 flex justify-center items-center'>?</Link>
+          <Link href='/about' className='fixed bottom-5 left-5 hover:text-zinc-300'>
+            <Info size={32} />
+          </Link>
         </div>
       </main>
     </>
