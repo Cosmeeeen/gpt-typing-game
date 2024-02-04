@@ -76,14 +76,9 @@ export const testResultsRouter = createTRPCRouter({
     const { wpm, prompt, score, time } = input;
 
     const userId = ctx.session?.user.id;
-    const userDetails = await ctx.db.user.findUnique({
-      where: { id: userId},
-      select: { bestWpm: true, totalScore: true }
-    });
-    const { bestWpm: currentBestWpm, totalScore: currentTotalScore } = userDetails ?? { bestWpm: 0, totalScore: '0' };
+    if (userId) {
+    }
   
-    const bestWpm = Math.max(currentBestWpm, wpm);  
-    const totalScore = (parseInt(currentTotalScore, 10) + score).toString();
 
     try { 
       const createdResult = await ctx.db.testResult.create({
@@ -98,6 +93,15 @@ export const testResultsRouter = createTRPCRouter({
       });
 
       if (userId) {
+        const userDetails = await ctx.db.user.findUnique({
+          where: { id: userId},
+          select: { bestWpm: true, totalScore: true }
+        });
+        const { bestWpm: currentBestWpm, totalScore: currentTotalScore } = userDetails ?? { bestWpm: 0, totalScore: '0' };
+        
+        const bestWpm = Math.max(currentBestWpm, wpm);  
+        const totalScore = (parseInt(currentTotalScore, 10) + score).toString();
+
         await ctx.db.user.update({
           where: {
             id: userId,
