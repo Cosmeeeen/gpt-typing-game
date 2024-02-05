@@ -7,7 +7,6 @@ import defaultPortrait from '../data/defaultPortrait.png';
 import { useRouter } from 'next/router';
 import ResultsTable from '~/components/ResultsTable';
 import { api } from '~/utils/api';
-import HomeButton from '~/components/HomeButton';
 
 const ProfilePage = () => {
   const { data: session, status } = useSession();
@@ -57,7 +56,6 @@ const ProfilePage = () => {
     <>
       <main className="flex min-h-screen flex-col items-center justify-center bg-zinc-900 text-zinc-100 gap-2 w-full">
         <div className="w-1/2">
-          <HomeButton />
           {renderProfile()}
           <ResultsTable />
         </div>

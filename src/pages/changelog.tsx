@@ -1,6 +1,5 @@
 import moment from 'moment';
 import * as React from 'react';
-import HomeButton from '~/components/HomeButton';
 import Spinner from '~/components/Spinner';
 import { api } from '~/utils/api';
 
@@ -9,7 +8,6 @@ const AboutPage = () => {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center text-center bg-zinc-900 text-zinc-100 gap-1">
-      <HomeButton />
       <div className="flex flex-col w-full md:w-3/4 gap-2">
         {isLoading ? (
           <Spinner />

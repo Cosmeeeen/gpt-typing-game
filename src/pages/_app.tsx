@@ -9,6 +9,8 @@ import { api } from "~/utils/api";
 import "~/styles/globals.css";
 import Head from "next/head";
 
+import HamburgerMenu from '../components/HamburgerMenu';
+
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,
   pageProps: { session, ...pageProps },
@@ -19,6 +21,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
         <title>GPT Typing Game</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
+      <HamburgerMenu />
       <Component {...pageProps} />
       <Analytics />
       <SpeedInsights />

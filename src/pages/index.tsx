@@ -194,9 +194,6 @@ export default function Home() {
           </div>
           {renderContent()}
           {renderBottom()}
-          <Link href='/about' className='fixed bottom-5 left-5 hover:text-zinc-300'>
-            <Info size={32} />
-          </Link>
         </div>
       </main>
     </>

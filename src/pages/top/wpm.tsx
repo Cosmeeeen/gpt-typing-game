@@ -4,7 +4,6 @@ import { api } from '~/utils/api';
 
 import defaultPortrait from '~/data/defaultPortrait.png';
 import { useSession } from 'next-auth/react';
-import HomeButton from '~/components/HomeButton';
 import Spinner from '~/components/Spinner';
 
 const TopWpmPage = () => {
@@ -13,7 +12,6 @@ const TopWpmPage = () => {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-zinc-900 text-zinc-100">
-      <HomeButton />
       Users With The Highest All-Time WPM
       <div className="flex flex-col w-full md:w-1/2 gap-2">
         {isLoading ?
