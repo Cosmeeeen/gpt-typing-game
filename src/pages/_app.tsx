@@ -1,8 +1,7 @@
 import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import { type AppType } from "next/app";
-import { Analytics } from '@vercel/analytics/react';
-import { SpeedInsights } from "@vercel/speed-insights/next"
+import LogLib from '@loglib/tracker/react';
 
 import { api } from "~/utils/api";
 
@@ -21,10 +20,9 @@ const MyApp: AppType<{ session: Session | null }> = ({
         <title>GPT Typing Game</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
+      <LogLib config={{ id: 'gpt-typing-game' }} />
       <HamburgerMenu />
       <Component {...pageProps} />
-      <Analytics />
-      <SpeedInsights />
     </SessionProvider>
   );
 };
