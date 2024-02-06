@@ -4,7 +4,7 @@ import { loglib } from '@loglib/tracker';
 
 const AboutPage = () => {
   const handleLinkClick = (e: React.MouseEvent<HTMLElement>) => {
-    loglib.track('click', { href: e.currentTarget.getAttribute('href'), text: e.currentTarget.textContent });
+    loglib.track('about-link-click', { href: e.currentTarget.getAttribute('href'), text: e.currentTarget.textContent });
   };
 
   return (
