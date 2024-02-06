@@ -1,14 +1,14 @@
 import * as React from 'react';
 
 import Head from "next/head";
-import Link from 'next/link';
-import { Info, X } from 'react-feather';
+import { X } from 'react-feather';
 
 import { getTypingTest, getWordScore } from '~/utils/typingTest';
 import Spinner from '~/components/Spinner';
 import Timer from '~/components/Timer';
 import { api } from '~/utils/api';
 import UserPortrait from '~/components/UserPortrait';
+import { loglib } from '@loglib/tracker';
 
 const CurrentWord: React.FC<{ word: string | undefined, inputValue: string }> = ({ word, inputValue }) => {
   return (
@@ -48,7 +48,8 @@ export default function Home() {
 
   const { mutate: mutateResult } = api.testResults.create.useMutation();
 
-  const restartTest = React.useCallback(() => {
+  const startTest = React.useCallback(() => {
+    loglib.track('start-typing-test', { topic });
     if (!loading) {
       setLoading(true);
       setStartTime(undefined);
@@ -98,20 +99,24 @@ export default function Home() {
   }, [startTime, endTime, testRunning]);
 
   const endTest = React.useCallback(() => {
+    loglib.track('abandon-typing-test', { topic });
     setTestRunning(false);
     setEndTime(Date.now());
     setInputValue('');
-  }, []);
+  }, [topic]);
 
   const submitResult = React.useCallback((finalScore: number) => {
+    const finalWpm = getWPM(finalScore) ?? 0;
+    const finalTime = getTime() ?? 0;
     endTest();
     const resultsObject = {
-      wpm: getWPM(finalScore) ?? 0,
-      time: getTime() ?? 0,
+      wpm: finalWpm,
+      time: finalTime,
       score: Math.floor(finalScore / 5),
       prompt: topic,
     };
     mutateResult(resultsObject);
+    loglib.track('end-typing-test', { topic, wpm: finalWpm, time: finalTime, score: Math.floor(finalScore / 5) });
   }, [topic, getWPM, mutateResult, getTime, endTest]);
 
   const onType = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -175,10 +180,10 @@ export default function Home() {
     }
     return (
       <div className='flex gap-1 w-full'>
-        <button onClick={restartTest} className='bg-zinc-800 rounded p-2 grow'>Start</button>
+        <button onClick={startTest} className='bg-zinc-800 rounded p-2 grow'>Start</button>
       </div>
     );
-  }, [testRunning, loading, inputValue, onType, restartTest, endTest]);
+  }, [testRunning, loading, inputValue, onType, startTest, endTest]);
 
   return (
     <>

@@ -20,6 +20,7 @@ const ProfilePage = () => {
     }
 
     if (status === 'unauthenticated' || !session) {
+      void signIn();
       void router.push('/');
 
       return (

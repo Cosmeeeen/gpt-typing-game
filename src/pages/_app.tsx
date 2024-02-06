@@ -20,7 +20,10 @@ const MyApp: AppType<{ session: Session | null }> = ({
         <title>GPT Typing Game</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <LogLib config={{ id: 'gpt-typing-game' }} />
+      <LogLib config={{
+        id: 'gpt-typing-game',
+        host: "/api/loglib",
+      }} />
       <HamburgerMenu />
       <Component {...pageProps} />
     </SessionProvider>
